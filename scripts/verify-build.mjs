@@ -10,3 +10,11 @@ const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest')
 if(!manifest.name.includes('RHTFLOW')||!manifest.name.includes('TEST'))throw Error('Brand missing');
 for(const icon of manifest.icons){const b=fs.readFileSync(path.join(root,icon.src));const [w,h]=icon.sizes.split('x').map(Number);if(b.readUInt32BE(16)!==w||b.readUInt32BE(20)!==h)throw Error('Icon dimensions '+icon.src);}
 console.log('Verified '+files.length+' PWA resources; separate TEST scope');
+
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+for(const view of ['tickets','admin']){
+ if(!fs.existsSync('branding/'+view+'.png'))continue;
+ const url='./icons/menu-'+view+'.webp';
+ if(!files.includes(url)||!app.includes(url)||html.split('src="'+url+'"').length!==3)throw Error('Missing desktop/mobile/header or offline artwork for '+view);
+}
