@@ -1,0 +1,53 @@
+name: RHTFLOW TEST Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: rhtflow-test-pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: trummcardsgit/firmenplaner-updates
+          ref: 8ea7243a445d47e7a1e4eb6fc0704d76a5896ea5
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare original artwork
+        run: |
+          python3 -m pip install --user Pillow==11.3.0
+          python3 scripts/prepare-branding.py
+      - name: Build isolated TEST PWA
+        working-directory: source
+        run: |
+          node cloud/build-staging.mjs
+          node -e 'const fs=require("fs");const s=fs.readFileSync("cloud/staging-preview/config.js","utf8");if(!s.includes("cpycfxolqpidfjbhhsmr")||s.includes("ilmwoapvcluoravpsrjv")||s.includes("hgdexyvtgfffcasfpjyu")||!s.includes("sb_publishable_"))throw Error("Wrong database");'
+          for f in cloud/staging-preview/*.js; do node --check "$f"; done
+          touch cloud/staging-preview/.nojekyll
+      - name: Validate and isolate service worker
+        run: node scripts/verify-build.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: source/cloud/staging-preview
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy TEST only
+        id: deployment
+        uses: actions/deploy-pages@v4
