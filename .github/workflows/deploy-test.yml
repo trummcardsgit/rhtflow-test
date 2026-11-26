@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: trummcardsgit/firmenplaner-updates
-          ref: 8ea7243a445d47e7a1e4eb6fc0704d76a5896ea5
+          ref: 0d4a84773683a21f9089acae476230f72ff8ebac
           path: source
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -36,7 +36,9 @@ jobs:
           for f in cloud/staging-preview/*.js; do node --check "$f"; done
           touch cloud/staging-preview/.nojekyll
       - name: Validate and isolate service worker
-        run: node scripts/verify-build.mjs
+        run: |
+          node scripts/verify-build.mjs
+          node source/cloud/tests/pwa-isolation-smoke.mjs source/cloud/staging-preview/sw.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
