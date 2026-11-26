@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: trummcardsgit/firmenplaner-updates
-          ref: 70372dcf0be36f7800cbf888ef546bd8323154e2
+          ref: 150fe487b932723838ebf892511238e6db81fac5
           path: source
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -41,6 +41,7 @@ jobs:
           node source/cloud/tests/pwa-isolation-smoke.mjs source/cloud/staging-preview/sw.js
           node source/cloud/tests/recovery-smoke.mjs
           node source/cloud/tests/activation-smoke.mjs
+          node source/cloud/tests/showcase-smoke.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
