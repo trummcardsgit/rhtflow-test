@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: trummcardsgit/firmenplaner-updates
-          ref: 45defab73110cb6206eabda9f61bae7e56acc56a
+          ref: e9cb0deab6427222b0bbc5b2621f8e74790c83b7
           path: source
           persist-credentials: false
       - uses: actions/setup-node@v4
